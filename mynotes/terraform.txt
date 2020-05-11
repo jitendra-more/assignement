@@ -1,0 +1,172 @@
+Course Layout
+
+===Introduction===
+What is Terraform
+Installing
+First Steps
+
+===Terraform basics===
+Variables
+Provisioning on Linux/Windows
+Output
+State
+DataSources
+Template Provider
+Modules
+Other providers
+
+=== Terraform on AWS===
+VPC
+EC2 instances and EBS
+Security Group
+Userdata
+Static IPs and DNS
+RDS
+IAM Users and Groups
+IAM Roles
+Autoscaling Load Balancer
+
+===Terraform with Packers===
+Building AMIs
+A Jenkins workflow
+
+===Docker===
+Introduction
+Docker Repository
+Docker Orchestration
+Terraform with ECR
+Terraform with ECS
+A jenkins workflow with Terraform, ECR, ECS
+
+
+---------------------------------------------------
+
+
+===What is Terraform===
+
+- Infrastructure as cod
+- Automation of your infrastructure 
+- Keep your infrastructure in a certain state (compliant)
+	- eg. 2 Web instances with 2 volumes, and 1 load balancer
+		
+
+- Make your infrastructure auditable 
+	- Yo can keep your infrastructure change history in a version control system like GIT
+
+- Ansible, Chef, Puppet, Saltstack have a focus on automating the installation, and configuration of software
+	 - Keeping the machines in compliance, in a certain state
+
+- Terraform can automate provisioning of the infrastructure itself
+	- eg. Using the AWS, DigitalOcean, Azure API
+
+- Work well with automate software like ansible to install software after the infrastructure is provisioned
+
+
+===Installation===
+
+https://www.terraform.io/downloads.html
+
+
+===Understanding HCL===
+var.mylist
+var.mylist[0]
+element(var.mylist, 1)
+element(var.mylist, 0)
+slice(var.mylist, 0, 2)
+
+
+=== First Steps===
+
+- Spinning up an instance on AWS
+ - Open AWS Account 
+ - Create IAM admin user
+ - Create terraform file to spin up t2.micro intance
+ - Run terraform apply
+
+ - Testing what infrastructure would be built based on our terraform file:
+
+	$terraform plan 
+
+ - Then use terraform apply to execute the changes: 
+
+	$terraform apply
+
+ - Keeping the changes in an out file
+
+	$terraform plan -out changes.terraform
+
+- Then only apply those changes to the infrastructure 
+	$terraform apply changes.terraform
+	$rm changes.terraform
+
+- Afterwards the infrastructure can be destroyed again: 
+	$terraform destroy
+
+- Now the instances are terminated and you stop paying AWS for the EC2 instances
+- Be very careful with this command on a production environment!
+
+-  Highly recommend to apply output file, because it showw changes beore applying.
+
+
+===Terraform Variable Types===
+
+- Terraform variables were completely reworked for the terraform 0.12 release
+- You can now have more control over the variables, and have for and for-each-loops, which where not possible with earlier versions
+- You don't have to specify the type in variables, but it's recommended
+ - Terraform's simple variable types
+	- String
+	- Number
+	- Bool
+eg. 
+	variable "a-string" {
+	 type = string
+	}
+
+	variable "this-is-a-number" {
+	 type = number
+	}
+
+	variable "true-or-false" {
+	 type=bool
+	}
+
+  - Terraform's complex types
+	- List(type)
+	- Set(type)
+	- map(type)
+	- Object({<ATTR_NAME> = <Type>, ...})
+	- Tuple([<Type>, ...])
+
+- List & Map we already covered during a previous demo
+	- List: [0,1,5,2]
+	- Map: {"key" = "value"}
+- A list is always ordered, it will always return 0,1,5,2 and not 5,1,2,0
+- A "set" is like a list, but it doesn't keep the order you put it in, and can only contain unique values
+	- A list that has [5, 1, 1, 2] becomes [1,2,5] in a set (when you output it, terraform will sort it)
+
+- An object is like a map, but each element can have a different type
+- For example: 
+	{
+	firstname = "John"  # -- string 
+	housenumber = 10    # -- Number
+}
+
+- An tuple is like a list, but each element can have a different type 
+- For example: 
+	[0, "string", false"]
+- The ones you should remember are the simple variable type string, number,bool and the list & map
+- You can also let terraform decide on the type: 
+
+	variable "a-string" {
+		default = "this is a string"
+	}
+
+	variable "this-is-a-list" {
+		default = [ "list of", "string"]
+	}
+
+
+
+
+
+
